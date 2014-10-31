@@ -11,6 +11,8 @@ var screenHeight;
 
 var gamestate;
 var gameOverMenu;
+var restartButton;
+var playHUD;
 
 gameInitialize();
 snakeInitialize();
@@ -30,7 +32,15 @@ function gameInitialize() {
     
     document.addEventListener("keydown", keyboardHandler);
     
+    
     gameOverMenu = document.getElementById("gameOver");
+    
+    
+   
+    restartButton = document.getElementById("restartButton");
+    restartButton.addEventListener("click",gameRestart);
+    
+    playHUD = document.getElementById("playHUD");
     
     setState("PLAY");
 }
@@ -49,6 +59,18 @@ function gameDraw() {
     context.fillRect(0, 0, screenWidth, screenHeight);
     
 }
+
+function gameRestart(){
+    snakeInitialize();
+    foodInitialize();
+    hideMenu(gameOverMenu);
+    setState("PLAY");
+ }
+ 
+ /*-----------------------------------------------------------------------------
+ * Snake Function
+ * ----------------------------------------------------------------------------
+ */
 
 function snakeInitialize() {
     snake = [];
@@ -90,8 +112,9 @@ function snakeUpdate() {
         snakeHeadX--;
     }
     
-    checkFoodCollision(snakeHeadX, snakeHeadY);
-    checkWallCollision(snakeHeadX, snakeHeadY);
+    checkFoodCollisions(snakeHeadX, snakeHeadY);
+    checkWallCollisions(snakeHeadX, snakeHeadY);
+    checkSnakeCollisions(snakeHeadX, snakeHeadY);
     
     var snakeTail = snake.pop();
     snakeTail.x = snakeHeadX;
@@ -112,6 +135,7 @@ function foodDraw() {
     context.fillRect(food.x * snakeSize, food.y * snakeSize, snakeSize, snakeSize);
 }
 
+ 
 
 function setFoodPostition(){
     var randomX = Math.floor(Math.random() * screenWidth);
@@ -171,7 +195,7 @@ function keyboardHandler(event) {
  * Collision Handling
  * -------------------------------------------
  */
-    function checkFoodCollision(snakeHeadX, snakeHeadY) {
+    function checkFoodCollisions(snakeHeadX, snakeHeadY) {
       if (snakeHeadX == food.x && snakeHeadY == food.y) {  
         snake.push({
                 x:0,
@@ -182,17 +206,24 @@ function keyboardHandler(event) {
 }
 }
  
-
-    function checkWallCollision(snakeHeadX, snakeHeadY){
+    function checkWallCollisions(snakeHeadX, snakeHeadY){
         if(snakeHeadX * snakeSize >= screenWidth || snakeHeadX * snakeSize < 0){
             setState("GAME OVER");
             
-        }
-            
-                    
+        }              
     }
 
-     
+
+    function checkSnakeCollisions(snakeHeadX, snakeHeadY) {
+        for(var index = 1; index < snake.length; index++) {
+            if(snakeHeadX == snake[index].x && snakeHeadY == snake[index].y) {
+                setState("GAME OVER");
+                return;
+                
+            }
+            
+        }
+    }
      /*------------------------------------------------------------------------
       *  Game State Handiling
       * -----------------------------------------------------------------------
@@ -208,8 +239,23 @@ function keyboardHandler(event) {
          menu.style.visibility = "visible";
      }
      
+     function hideMenu(menu) {
+         menu.style.visibility = "hidden";
+     }
+     
      function showMenu(state){
          if(state == "GAME OVER" ) {
              displayMenu(gameOverMenu);
          }
+         
+         /*
+          * function
+          */ 
      }
+     
+     function centerMenuPoisition(menu){
+         menu.style.top = (screenHieght / 2) + "px";
+         f
+     }
+         
+    
